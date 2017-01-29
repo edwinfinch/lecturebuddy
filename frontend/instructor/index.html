@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lecture Buddy</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" src="stylesheet.css">
+    <link rel="stylesheet" src="../../createsession/mycss.css">
+    <link rel="stylesheet" src="../../describeyourself/mycss.css">
+    <link rel="stylesheet" type="text/css" href="../session/cache_sucks.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-dT8WZNLW+WmnMquYY8GD+px5+PPMy/Rz1pZTBuLQv7EfAZG0xhipTd08JFVCf8bp" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js" integrity="sha384-jspctxrQmizRroXAKjoWWOOhkG3aZesspL7dmISSX5+p1LfXftbGQocYmzOsv9wx" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.js"></script>
+
+    <style type="text/css">
+        canvas {
+            padding: 10%;
+        }
+
+        #header-container {
+            padding-left: 15px;
+            padding-right: 15px;
+            margin-left: auto;
+            background-color: lightblue;
+        }
+
+        #header-container h1 {
+            padding-top: 16px;
+            padding-bottom: 14px;
+            margin: 0px;
+        }
+
+        #content p {
+            padding: 20px 45px 20px 45px;
+            font-size: 135%;
+            display: inline-block;
+        }
+
+        #content img {
+            margin: 5px 0 5px;
+            width: 120px;
+            height: 120px;
+            display: inline-block;
+        }
+
+        #content {
+            text-align: center;
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sessionEndedDiv" class="container" style="margin-left: 0px;" hidden>
+        <h1>Session ended.</h1>
+        <p>You ended the session. Please wait while your stats are generated.</p>
+        <button type="button" class="btn btn-success" onclick="goHome()">Go home</button>
+    </div>
+    <div id="maincontent">
+        <div id="header-container">
+            <h1>Instructor</h1>
+            <p id="connecting">Connecting...</p>
+            <br>
+        </div>
+        <div style="padding:20px;">
+            <h1>Session ID: SQZZY6</h1>
+        </div>
+        <div style="padding:20px;padding-top:0px;">
+            <button type="button" class="btn btn-danger" onclick="endSession()">End session</button>
+        </div>
+        <div id="content">
+            <p id="currentMood"><p id="emojiHolder"></p></p>
+            <canvas id="myChart" width="80%" height="80%"></canvas></div>
+    </div>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.9/css/bootstrap-dialog.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.9/js/bootstrap-dialog.min.js"></script>
+
+    <script>
+    function doImageShit(imageID){
+        var mood = "";
+
+        $(function() {
+            $.ajax({
+                url: "https://api.projectoxford.ai/emotion/v1.0/recognize",
+                beforeSend: function(xhrObj){
+                    // Request headers
+                    xhrObj.setRequestHeader("Content-Type","application/json");
+                    xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key","d7a37fa199af4ce49960731af5aaf227");
+                },
+                type: "POST",
+                // Request body
+                data: '{"url": "http://lecturebuddy.net/images/' + imageID + '.png"}',
+            })
+
+            .done(function(data) {
+                var emotions = [];
+                emotions.length = 8;
+                var current_emotion = [];
+                var max = [];
+
+                for (var i = 0; i < 8; i++)
+                	emotions[i] = 0;
+
+                for (var i = 0; i < 1; i++) {
+                	max[i] = 0;
+                	current_emotion[i] = "";
+                }
+
+                for (var i = data.length - 1; i >= 0; i--) {
+                	for (var j = emotions.length - 1; j >= 0; j--) {
+                    	emotions[j] += data[i].scores[Object.keys(data[i].scores)[j]] * 100 / data.length;
+                    }
+                }
+
+                for (var i = 0; i < emotions.length; i++) {
+                	if (emotions[i] > 80) {
+                		max[0] = emotions[i];
+                		max[1] = 0;
+                		current_emotion[0] = Object.getOwnPropertyNames(data[0].scores)[i];
+                	} else {
+                		if (emotions[i] > max[0]) {
+                			max[1] = max[0];
+                			max[0] = emotions[i];
+                			current_emotion[1] = current_emotion[0];
+                			current_emotion[0] = Object.getOwnPropertyNames(data[0].scores)[i];
+                		} else if (emotions[i] > max[1]) {
+                			max[1] = emotions[i];
+                			current_emotion[1] = Object.getOwnPropertyNames(data[0].scores)[i];
+                		}
+                	}
+                }
+
+        		console.log(current_emotion);
+
+        		if (current_emotion[0] == "neutral" && current_emotion[1] == "sadness") {
+        			mood = 'bored';
+        		} else if ((current_emotion[0] == "neutral" && current_emotion[1] == "happiness") || current_emotion[0] == "happiness") {
+        			mood = 'content'
+        		} else if ((current_emotion[0] == "sadness" && (current_emotion[1] == "neutral" || current_emotion[1] == "anger")) || (current_emotion[0] == "anger" && (current_emotion[1] == "sadness" || current_emotion[1] == "neutral")) || (current_emotion[0] == "neutral" && current_emotion[1] == "anger")) {
+        			mood = 'confused'
+        		} else {
+        			mood = current_emotion[0];
+        		}
+
+        		console.log(mood);
+
+                if(mood !== ""){
+                    document.getElementById("currentMood").innerHTML = "The current overall mood is " + mood + ".";
+
+                    var emojiHolder = document.getElementById("emojiHolder");
+                    if (mood === "confused") {
+                        emojiHolder.innerHTML = "<img src='../images/sad.png'/>";
+                    } else if (mood === "content") {
+                        emojiHolder.innerHTML = "<img src='../images/hap.png'/>";
+                        // moodHolder.insertAdjacentHTML("afterend", "<img src='../images/hap.png'/>")
+                    } else if (mood === "bored" || mood === "neutral") {
+                        emojiHolder.innerHTML = "<img src='../images/neu.png'/>";
+                        // moodHolder.insertAdjacentHTML("afterend", "<img src='../images/neu.png'/>")
+                    }
+                }
+            })
+
+            .fail(function(error) {
+                console.log(error.getAllResponseHeaders());
+                // alert("fail");
+            });
+        });
+    }
+
+
+    function goHome(){
+        document.location = "http://www.lecturebuddy.net/";
+    }
+
+    function showSessionID(){
+        window.alert("SQZZY6");
+    }
+
+        var moodHolder = document.getElementById('currentMood');
+        var mood = 'confused' || 'content' || 'bored';
+        var current_emotions = ['neutral', 'sadness'];
+
+        moodHolder.innerHTML = "The current mood of your session is unknown because your session just began.";
+
+        // moodHolder.innerHTML = "The current mood of your class room is " + mood.toUpperCase() + " (" + current_emotions[0] + " and " + current_emotions[1] + ").";
+
+        // if (mood === "confused") {
+        //     moodHolder.insertAdjacentHTML("afterend", "<img src='../images/sad.png'/>")
+        // } else if (mood === "content") {
+        //     moodHolder.insertAdjacentHTML("afterend", "<img src='../images/hap.png'/>")
+        // } else if (mood === "bored") {
+        //     moodHolder.insertAdjacentHTML("afterend", "<img src='../images/neu.png'/>")
+        // }
+
+        var ctx = document.getElementById("myChart");
+        var scores = [0, 0, 0]
+        var myChart = new Chart(ctx, {
+            padding: 40,
+            type: 'pie',
+            data: {
+                labels: ["Too\nLoud", "Too\nQuiet", "Slow\nDown"],
+                datasets: [{
+                    data: scores,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.65)',
+                        'rgba(54, 162, 235, 0.65)',
+                        'rgba(255, 206, 86, 0.65)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Live Student Feedback',
+                    fontSize: 19
+                },
+                scales: {
+                    xAxes: [{
+                        display: false,
+                    }],
+                    yAxes: [{
+                        display: false
+                    }]
+                },
+                legend: {
+                    display: true,
+                    text: ['Go slower', 'Talk louder', 'Go faster'],
+                    labels: {
+                        fontSize: 15
+                    }
+                }
+            }
+        });
+
+
+        var connectionOpened = false;
+        var connection = undefined;
+
+        function endSession() {
+            connection.send(JSON.stringify({
+                requestType: 666 //yes, really
+            }));
+        }
+
+        function attemptConnection() {
+            connection = new WebSocket("ws://api.lecturebuddy.net:777/elonmusk/TEACHER");
+
+            connection.onopen = function() {
+                console.log("Opened");
+
+                connectionOpened = true;
+
+                connection.send(JSON.stringify({
+                    requestType: 10
+                }));
+
+                document.getElementById("connecting").innerHTML = "Connected."
+            };
+
+            connection.onclose = function() {
+                console.log("Closed");
+
+                connectionOpened = false;
+
+                document.getElementById("connecting").innerHTML = "Not connected. Attempting to reconnect...";
+            };
+
+            connection.onmessage = function(e) {
+                console.log("Hey " + e.data);
+
+                var jsonData = JSON.parse(e.data);
+
+                console.log("Got json data " + e.data);
+
+                switch (jsonData.requestType) {
+                    case 3:
+                    case 10:
+                        myChart.data.datasets[0].data = jsonData.dataset;
+                        myChart.update();
+                        console.log("Got data");
+                        break;
+                    case 666:
+                        document.getElementById("maincontent").innerHTML = "";
+                        document.getElementById("sessionEndedDiv").hidden = false;
+                        break;
+                    case 777:
+                        doImageShit(jsonData.imageID);
+                        break;
+                }
+            }
+        }
+
+        setInterval(function() {
+            if (!connectionOpened) {
+                console.log("Attempting connection...");
+                attemptConnection();
+            }
+        }, 1000);
+
+
+
+        // var fuck = 0;
+        // setInterval(function(){
+        //     fuck++;
+        //     var newshit = [1+fuck, 2, 3];
+        //     myChart.data.datasets[0].data = newshit;
+        //     myChart.update();
+        //     console.log("chart " + myChart.data.datasets[0].data);
+        // }, 1000);
+    </script>
+</body>

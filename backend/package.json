@@ -1,0 +1,13 @@
+{
+    "name": "lecture-buddy",
+    "version": "0.0.1",
+    "description": "Giving the classroom more emotion",
+    "keywords": ["mchacks"],
+    "homepage": "",
+    "author": "Edwin, Tori, Kazic, Haoda",
+    "dependencies": {
+        "mongojs": "*",
+        "express": "*",
+        "express-ws": "*"
+    }
+}

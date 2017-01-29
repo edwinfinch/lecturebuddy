@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+</head>
+<body>
+<script type="text/javascript">
+
+	function hasGetUserMedia() {
+	  return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
+	            navigator.mozGetUserMedia || navigator.msGetUserMedia);
+	}
+
+	if (hasGetUserMedia()) {
+	  // Good to go!
+	} else {
+	  alert('getUserMedia() is not supported in your browser');
+	}
+</script>
+<video id="camera" autoplay muted style="width: 1900px; height: 900px"></video>
+<canvas id="snapshot" width="1900" height="900"></canvas>
+<p id="hazik"></p>
+<script>
+	var errorCallback = function(e) {
+		console.log('Reeeejected!', e);
+	};
+
+	var video = document.getElementById('camera');
+	var snapshotCanvas = document.getElementById('snapshot');
+
+	function successCallback(stream) {
+		video.src = window.URL.createObjectURL(stream);
+		video.play();
+	}
+
+	function gotSources(sourceInfos) {
+		var audioSource = 0;
+		var videoSource = 0;
+
+		for (var i = 0; i != sourceInfos.length; ++i) {
+			var sourceInfo = sourceInfos[i];
+			if (sourceInfo.kind === 'audioinput') {
+				//console.log(sourceInfo.id, sourceInfo.logabel || 'microphone');
+
+				audioSource = false; //sourceInfo.id;
+			} else if (sourceInfo.kind === 'videoinput') {
+				document.getElementById('hazik').innerHTML = sourceInfo.groupId + '\n' + sourceInfo.label + '\n';
+				videoSource = sourceInfo.groupId;
+			} else {
+				//console.log('Some other kind of source: ', sourceInfo);
+			}
+		}
+
+		sourceSelected(audioSource, videoSource);
+	}
+
+	navigator.mediaDevices.enumerateDevices().then(function(e){
+		gotSources(e)
+	});
+
+    function takeImage(){
+		var context = snapshot.getContext('2d');
+		// Draw the video frame to the canvas.
+		context.drawImage(camera, 0, 0, snapshotCanvas.width,
+		snapshotCanvas.height);
+
+		var data = snapshotCanvas.toDataURL("image/jpg");
+
+        console.log("Spook " + data.length);
+
+        var postData = {
+            imageData: data
+        };
+
+        $.post("http://api.lecturebuddy.net:777/image/write", JSON.stringify(postData), function(data, status){
+            var object = JSON.parse(data);
+            console.log(JSON.stringify(object));
+            if(object.result !== 200){
+                console.log("Server error, it seems: " + object.message);
+            }
+            else{
+                console.log("Uploaded");
+            }
+        });
+    }
+
+	setInterval(takeImage, 10 * 1000);
+
+	function sourceSelected(audioSource, videoSource) {
+		var constraints = {
+			audio: {
+				optional: [{sourceId: audioSource}]
+			},
+			video: {
+				optional: [{sourceId: videoSource}]
+			}
+		};
+
+		navigator.webkitGetUserMedia(constraints, successCallback, errorCallback);
+	}
+
+    setTimeout(takeImage, 1000);
+</script>
+</body>
+</html>

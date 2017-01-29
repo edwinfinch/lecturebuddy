@@ -1,0 +1,305 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Lecture Buddy</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" src="../describeyourself/mycss.css">
+    <link rel="stylesheet" src="../createsession/mycss.css">
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-dT8WZNLW+WmnMquYY8GD+px5+PPMy/Rz1pZTBuLQv7EfAZG0xhipTd08JFVCf8bp" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js" integrity="sha384-jspctxrQmizRroXAKjoWWOOhkG3aZesspL7dmISSX5+p1LfXftbGQocYmzOsv9wx" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" type="text/css" href="cache_sucks_.css">
+</head>
+
+<body>
+    <div class="container" style="margin-left: 0px;">
+        <div>
+            <h1>Session</h1>
+            <p id="studentsConnected">Connecting...</p>
+            <h3>Let the teacher know if they can do a bit better</h3>
+            <button type="button" class="btn btn-warning">Go slower</button>
+            <button type="button" class="btn btn-warning">Talk louder</button>
+            <button type="button" class="btn btn-warning">Go faster</button>
+        </div>
+        <div class="row chat-window" id="chat_window_1" style="margin-right:0px;">
+            <div class="col-xs-12 col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading top-bar">
+                        <div class="col-md-8 col-xs-8">
+                            <h3 class="panel-title">Chat</h3>
+                        </div>
+                        <div class="col-md-4 col-xs-4" style="text-align: right;">
+                           <a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim"></span></a>
+                       </div>
+                    </div>
+                    <div class="panel-body msg_container_base" id="conversationDiv" style="max-height:300px;">
+                        <br>
+                        <p align="center" style="color:#bdc3c7">You joined the conversation</p>
+
+
+
+                    </div>
+                    <div class="panel-footer">
+                        <div class="input-group">
+                            <input id="messageTextInput" type="text" class="form-control input-sm chat_input" placeholder="Message..." />
+                            <span class="input-group-btn">
+                        <button class="btn btn-primary btn-sm" id="btn-chat" onclick="spreadRumours()">Send</button>
+                        </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.9/css/bootstrap-dialog.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.9/js/bootstrap-dialog.min.js"></script>
+
+<script>
+
+function generateID() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for(var i = 0; i < 6; i++){
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    return text.toUpperCase();
+}
+
+var connectionOpened = false;
+var connection = undefined;
+
+function attemptConnection(){
+    connection = new WebSocket("ws://api.lecturebuddy.net:777/elonmusk/" + generateID());
+
+    connection.onopen = function() {
+        console.log("Opened");
+
+        connectionOpened = true;
+
+        connection.send(JSON.stringify({
+            requestType: 0
+        }));
+    };
+
+    connection.onclose = function(){
+        console.log("Closed");
+
+        connectionOpened = false;
+
+        document.getElementById("studentsConnected").innerHTML = "Not connected. Attempting to reconnect..."
+    };
+
+    connection.onmessage = function(e){
+        console.log("Hey " + e.data);
+
+        var jsonData = JSON.parse(e.data);
+
+        console.log("Got json data " + jsonData);
+
+        switch(jsonData.requestType){
+            case 0:
+                console.log("Got " + jsonData.connectionCount + " connections!");
+                document.getElementById("studentsConnected").innerHTML =
+                    (jsonData.connectionCount === 1) ? ("You're the only one here :(") : (jsonData.connectionCount + " people are in the session");
+                break;
+            case 1:
+                document.getElementById("conversationDiv").innerHTML += '<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10"><div class="messages msg_sent"><p>' + jsonData.message.text + '</p><time datetime="">You • ' + (new Date()).toLocaleTimeString() + '</time></div></div></div>';
+
+                document.getElementById("messageTextInput").value = "";
+
+                $('.msg_container_base').scrollTop($('.msg_container_base')[0].scrollHeight);
+                break;
+            case 2:
+                document.getElementById("conversationDiv").innerHTML += '<div class="row msg_container base_receive"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>' + jsonData.message.text + '</p><time datetime="">' + jsonData.message.from + ' • ' + (new Date()).toLocaleTimeString() + '</time></div></div></div>';
+
+                $('.msg_container_base').scrollTop($('.msg_container_base')[0].scrollHeight);
+                break;
+        }
+    }
+}
+
+setInterval(function(){
+    if(!connectionOpened){
+        console.log("Attempting connection...");
+        attemptConnection();
+    }
+}, 1000);
+
+function spreadRumours(){
+    connection.send(JSON.stringify({
+        requestType: 1,
+        message: document.getElementById("messageTextInput").value
+    }));
+}
+
+document.getElementById('messageTextInput').onkeypress = function(e){
+    if (!e) e = window.event;
+    var keyCode = e.keyCode || e.which;
+    if (keyCode == '13'){
+      spreadRumours();
+      return false;
+    }
+  }
+
+</script>
+
+<script>
+    $(document).on('click', '.panel-heading span.icon_minim', function(e) {
+        var $this = $(this);
+        if (!$this.hasClass('panel-collapsed')) {
+            $this.parents('.panel').find('.panel-body').slideUp();
+            $this.addClass('panel-collapsed');
+            $this.removeClass('glyphicon-minus').addClass('glyphicon-plus');
+        } else {
+            $this.parents('.panel').find('.panel-body').slideDown();
+            $this.removeClass('panel-collapsed');
+            $this.removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        }
+    });
+    $(document).on('focus', '.panel-footer input.chat_input', function(e) {
+        var $this = $(this);
+        if ($('#minim_chat_window').hasClass('panel-collapsed')) {
+            $this.parents('.panel').find('.panel-body').slideDown();
+            $('#minim_chat_window').removeClass('panel-collapsed');
+            $('#minim_chat_window').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        }
+    });
+    $(document).on('click', '#new_chat', function(e) {
+        var size = $(".chat-window:last-child").css("margin-left");
+        size_total = parseInt(size) + 400;
+        alert(size_total);
+        var clone = $("#chat_window_1").clone().appendTo(".container");
+        clone.css("margin-left", size_total);
+    });
+    $(document).on('click', '.icon_close', function(e) {
+        //$(this).parent().parent().parent().parent().remove();
+        $("#chat_window_1").remove();
+    });
+</script>
+
+<!-- <script>
+    function getParameterByName(name, url) {
+        if (!url) {
+          url = window.location.href;
+        }
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    function createNewsession(){
+        console.log("Create session.");
+
+        var name = document.getElementById("nameInput").value;
+        var location = document.getElementById("locationInput").value;
+        var description = document.getElementById("descriptionInput").value;
+
+        var postData = {
+            name: name,
+            location: location,
+            description: description,
+            userID: "jason"
+        };
+
+        console.log("Sending " + JSON.stringify(postData));
+
+        $.post("https://payment.fluentudiscount.com:777/session/create", JSON.stringify(postData), function(data, status){
+            var object = JSON.parse(data);
+            console.log(JSON.stringify(object));
+            if(object.result !== 200){
+                console.log("Server error, it seems: " + object.error);
+
+                BootstrapDialog.show({
+                    title: "Server error",
+                    message: "Sorry my friends for letting you down, the server has failed.\n\nError: " + object.message,
+                    type: BootstrapDialog.TYPE_DANGER
+                });
+            }
+            else{
+                console.log("Good to go, thanks");
+
+                // BootstrapDialog.show({
+                //     title: "session created",
+                //     message: "Your session has been created! It's unique ID is: <b>" + object.id + "</b>\n\nShare this with your angels and guests so they can add themselves to your session.",
+                //     type: BootstrapDialog.TYPE_SUCCESS
+                // });
+
+                document.getElementById("nameInput").value = "";
+                document.getElementById("locationInput").value = "";
+                document.getElementById("descriptionInput").value = "";
+
+                document.getElementById("idInput").value = object.id;
+
+                document.getElementById("sessionCreatedDiv").hidden = false;
+                document.getElementById("createsessionDiv").hidden = true;
+            }
+        });
+    }
+
+    function updateDetails(){
+        var outfitInput = document.getElementById("outfitInput");
+        var detailsInput = document.getElementById("detailsInput");
+        var phoneNumberInput = document.getElementById("phoneNumberInput");
+
+        var updateObject = {
+            "userID":"Annie",
+            "details": {
+                "wearing": outfitInput.value,
+                "description": detailsInput.value,
+                "photo":""
+            },
+            "phoneNumber":phoneNumberInput.value
+        };
+
+        console.log("Sending " + JSON.stringify(updateObject));
+
+        $.post("https://payment.fluentudiscount.com:777/user/update", JSON.stringify(updateObject), function(data, status){
+            var object = JSON.parse(data);
+            console.log(JSON.stringify(object));
+            if(object.result !== 200){
+                console.log("Server error, it seems: " + object.error);
+
+                BootstrapDialog.show({
+                    title: "Server error",
+                    message: "Sorry my friends for letting you down, the server has failed.\n\nError: " + object.message,
+                    type: BootstrapDialog.TYPE_DANGER
+                });
+            }
+            else{
+                console.log("Good to go, thanks");
+
+                BootstrapDialog.show({
+                    title: "Profile updated",
+                    message: "Your profile's been successfully updated!",
+                    type: BootstrapDialog.TYPE_SUCCESS
+                });
+            }
+        });
+    }
+
+    function infinitesessionCheckedChanged(){
+        var checked = document.getElementById("infinitesessionCheckbox").checked;
+        console.log("Checked " + checked);
+
+        document.getElementById("durationSection").hidden = checked;
+    }
+</script> -->
+
+</html>

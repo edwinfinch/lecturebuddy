@@ -1,0 +1,100 @@
+
+/* The Magic Float Center Code */
+.button_group {
+    float: right;
+    position: relative;
+    left: -50%; /* or right 50% */
+    text-align: left;
+}
+.button_group > .child {
+    position: relative;
+    left: 50%;
+}
+
+
+/* style */
+body {
+    height:100%;
+    width:100%;
+    background-color: #DDDDDD;
+    font-family: arial, sans-serif;
+    font-size: 13px;
+}
+.clear {
+    clear:both;
+}
+/* Chat Style*/
+.chat {
+    max-width: 400px;
+}
+
+.chat_messages, .chat_textarea, .chat_name {
+    border: 1px solid #bbb;
+}
+.chat_messages{
+    width: 100%;
+    height: 400px;
+    background-color: white;
+    overflow-y: scroll;
+}
+.chat_textarea{
+    width: 100%;
+    max-width: 100%;
+}
+.chat_status{
+    color: white;
+}
+
+/*created by JScript*/
+.chat_message {
+    margin-bottom: 8px;
+}
+
+
+/* Button Style */
+#container {
+    width: 500px;
+    margin: 20px auto 0 auto;
+    background-color: #2196F3;
+
+    padding: 20px;
+    border-radius: 10px;
+}
+ul {
+    list-style-type: none;
+    margin:0;
+    padding:10px 0;
+}
+ul li {
+    float: left;
+    list-style-type: none;
+    margin: 0 6px;
+
+}
+/*individual buttons*/
+ul a {
+    display: block;
+    text-align: center;
+    align-items; center;
+
+    height: 75px;
+    width: 75px;
+    line-height: 26px;
+    border-radius: 15px;
+
+    font-size: 69px;
+    text-decoration: none;
+    color: black;
+    padding: 3px;
+    background-color: #ffffff;
+}
+p {
+    margin: 0;
+}
+
+#question{
+    height: 50px;
+    width: auto;
+    font-size: 14px;
+    font-weight: bold;
+}

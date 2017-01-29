@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Lecture Buddy - Real time instructor feedback!</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+
+    <style>
+        body {
+            background-image: url("biglecture.png");
+            background-attachment: fixed;
+            background-size: cover;
+            background-color: #bbb;
+            background-repeat: no-repeat;
+            min-height: 100%;
+            background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            -webkit-background-size: cover;
+
+            color: white;
+            font-family: 'Open Sans', sans-serif;
+
+        }
+        .nav {
+            display: block;
+            margin: 0 auto;
+            clear: both;
+            text-align: center;
+        }
+        .nav ul {
+            list-style-type: none;
+        }
+        .nav li a{
+            /*float: center;*/
+            display: inline-block;
+
+            margin: 10px;
+
+            border: 3px solid #FFFFFF;
+            padding: 20px;
+            text-decoration: none;
+            color: white;
+            border-radius: 15px;
+        }
+
+        .nav li a:hover{
+            background-color: rgba(255,255,255,0.5);
+        }
+        .container_splash {
+            display: block;
+            max-width: 500px;
+            margin: 0 auto;
+
+            padding: 30px;
+
+            background-color: rgba(220,240,240,0.9);
+            color: #0093ff;
+
+            border-style: solid;
+            border-color: #0093FF;
+            border-width: 2px;
+            border-radius: 15px;
+            clear: both;
+        }
+
+        .container_splash h1 {
+            font-weight:lighter;
+            font-size: 40px;
+            text-align: center;
+        }
+        .container_splash li {
+            margin-bottom: 8px;
+        }
+
+        button {
+            display: block;
+            background-color: rgba(255,255,255, 0.3);
+
+            border-style: solid;
+            border-color: #0093FF;
+            color: #0093ff;
+            border-radius: 15px;
+
+            font-family: 'Open Sans', sans-serif;
+            font-size: 25px;
+            padding: 10px;
+
+        }
+        button:hover {
+            background-color: rgba(255,255,255, 0.8)
+        }
+        button:active {
+            background-color: white;
+        }
+
+    </style>
+
+    <!-- Login screen data -->
+    <link rel="stylesheet" type="text/css" href="style_fuck_.css">
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" src="../describeyourself/mycss.css">
+    <link rel="stylesheet" src="../createsession/mycss.css">
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- ANIMATION SCRIPT -->
+    <script src = "splashAnimate.js"></script>
+    <link rel = "stylesheet" href = "animate.css">
+
+</head>
+<body>
+    <br>
+    <div class = "container_splash">
+        <h1>Lecture Buddy</h1>
+        <h2>Get real-time presentation feedback</h2>
+        <ul>
+            <li>Analyzes mood of audience using facial recognition</li>
+            <li>Allows audience to provide non-intrusive feedback to presenter in real time</li>
+            <li>Reflection analysis after presentation for further improvement </li>
+        </ul>
+        <center><button id = "getstarted">Get Started!</button></center>
+    </div>
+
+
+    <div class = "nav">
+        <ul style="padding-left:0px;">
+            <li> <a href="http://lecturebuddy.net/elon.html">Learn more about LectureBuddy</a></li>
+            <!-- <li> <a href = "#"> Contact our team! </a></li> -->
+        </ul>
+    </div>
+    <div class = "nav">
+        <ul style="padding-left:0px;">
+            <!-- <li> <a href = "#"> Learn more about</a></li> -->
+            <li> <a href = "mailto:edwin@lignite.io">Contact our team</a></li>
+        </ul>
+    </div>
+
+    <!-- HTML markup for Edwin's login session program -->
+
+
+    <!-- <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button> -->
+    <!-- <div id="status"></div> -->
+    <!-- this is where the website starts. Above should be the script for the facebook api -->
+    <div class="container">
+        <br>
+
+        <div class="well form-horizontal" action=" " method="post" id="contact_form">
+            <fieldset>
+                <!-- Form Name -->
+                <legend align="center">Attending something?</legend>
+
+
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label">ID</label>
+                    <div class="col-md-4 inputGroupContainer">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                            <input name="session_name" placeholder="ID of the session" class="form-control" type="text" id="sessionIdInput">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Name</label>
+                    <div class="col-md-4 inputGroupContainer">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                            <input name="description" placeholder="Your name" class="form-control" type="text" id="yourNameInput">
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Success message -->
+                <!-- <div class="alert alert-success" role="alert" id="success_message">Success <i class="glyphicon glyphicon-thumbs-up"></i> Thanks for contacting us, we will get back to you shortly.</div> -->
+
+                <!-- Button -->
+                <div class="form-group">
+                    <label class="col-md-4 control-label"></label>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-success" onclick="joinSession()">Join <!--<span class="glyphicon glyphicon-send"></span>--></button>
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
+        <div class="well form-horizontal" action=" " method="post" id="createsessionDiv">
+            <fieldset>
+
+                <!-- Form Name -->
+                <legend align="center">Create a session</legend>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Name</label>
+                    <div class="col-md-4 inputGroupContainer">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                            <input name="session_name" placeholder="Name of the session" class="form-control" type="text" id="nameInput">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Description</label>
+                    <div class="col-md-4 inputGroupContainer">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                            <input name="description" placeholder="Quick summary of session" class="form-control" type="text" id="descriptionInput">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success message -->
+                <!-- <div class="alert alert-success" role="alert" id="success_message">Success <i class="glyphicon glyphicon-thumbs-up"></i> Thanks for contacting us, we will get back to you shortly.</div> -->
+
+                <!-- Button -->
+                <div class="form-group">
+                    <label class="col-md-4 control-label"></label>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-success" onclick="createNewsession()">Create <!--<span class="glyphicon glyphicon-send"></span>--></button>
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
+
+
+        <div class="well form-horizontal" action=" " method="post" id="sessionCreatedDiv" hidden>
+            <fieldset>
+
+                <!-- Form Name -->
+                <legend align="center">session created!</legend>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label">ID</label>
+                    <div class="col-md-4 inputGroupContainer">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                            <input name="session_name" placeholder="" class="form-control" type="text" id="idInput" value="YODAWG" disabled>
+                        </div>
+                        <br>
+                        <label>Share this ID with your guests.</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Add angels</label>
+                    <div class="col-md-4 inputGroupContainer">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                            <input name="session_name" placeholder="Type in an angel's name here" class="form-control awesomplete" type="text" id="addAngelInput" data-list="Sangeet Parashar, Seal, Sandy Herriet">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="jasonAngelSection" hidden>
+                    <label class="col-md-4 control-label">#1</label>
+                    <div class="col-md-4 inputGroupContainer">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                            <input name="session_name" value="Sangeet Parashar" class="form-control" type="text" disabled>
+                        </div>
+                    </div>
+                    <a href="#">Remove</a>
+                </div>
+
+                <!-- <div class="form-group">
+        <label class="col-md-4 control-label">End</label>
+        <div class="col-md-4 inputGroupContainer">
+            <p id="datepairEnd">
+                <input type="text" class="date end" />
+                <input type="text" class="time end" />
+            </p>
+        </div>
+    </div> -->
+
+                <div></div>
+
+                <!-- Success message -->
+                <!-- <div class="alert alert-success" role="alert" id="success_message">Success <i class="glyphicon glyphicon-thumbs-up"></i> Thanks for contacting us, we will get back to you shortly.</div> -->
+
+                <!-- Button -->
+                <div class="form-group">
+                    <label class="col-md-4 control-label"></label>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-success" onclick="addAngel()">Add Angel <!--<span class="glyphicon glyphicon-send"></span>--></button>
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
+    </div>
+
+</body>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.9/css/bootstrap-dialog.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.9/js/bootstrap-dialog.min.js"></script>
+
+<!-- Script for Edwin's login session program -->
+<script>
+    function getParameterByName(name, url) {
+        if (!url) {
+          url = window.location.href;
+        }
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    function generateID() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for(var i = 0; i < 6; i++){
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+
+        return text.toUpperCase();
+    }
+
+    function joinSession(){
+        console.log("Create session.");
+
+        var sessionID = document.getElementById("sessionIdInput").value;
+        var nameInput = document.getElementById("yourNameInput").value;
+
+        var postData = {
+            sessionID: "SQZZY6",
+            name: nameInput
+        };
+
+        console.log("Sending " + JSON.stringify(postData));
+
+        $.post("http://api.lecturebuddy.net:777/session/join", JSON.stringify(postData), function(data, status){
+            var object = JSON.parse(data);
+            console.log(JSON.stringify(object));
+            if(object.result !== 200){
+                console.log("Server error, it seems: " + object.error);
+
+                BootstrapDialog.show({
+                    title: "Oh boy...",
+                    message: object.message,
+                    type: BootstrapDialog.TYPE_DANGER
+                });
+            }
+            else{
+                //Valid session
+                document.location = "http://www.lecturebuddy.net/session/?id=" + sessionID + "&n=" + nameInput + "&u=" + generateID();
+            }
+        });
+    }
+
+    function createNewsession(){
+        console.log("Create session.");
+
+        var name = document.getElementById("nameInput").value;
+        var description = document.getElementById("descriptionInput").value;
+
+        var postData = {
+            name: name,
+            description: description
+        };
+
+        console.log("Sending " + JSON.stringify(postData));
+
+        $.post("http://api.lecturebuddy.net:777/session/create", JSON.stringify(postData), function(data, status){
+            var object = JSON.parse(data);
+            console.log(JSON.stringify(object));
+            if(object.result !== 200){
+                console.log("Server error, it seems: " + object.error);
+
+                BootstrapDialog.show({
+                    title: "Server error",
+                    message: "Sorry my friends for letting you down, the server has failed.\n\nError: " + object.message,
+                    type: BootstrapDialog.TYPE_DANGER
+                });
+            }
+            else{
+                console.log("Good to go, thanks");
+
+                document.location = "http://www.lecturebuddy.net/instructor";
+            }
+        });
+    }
+</script>
+
+</html>
